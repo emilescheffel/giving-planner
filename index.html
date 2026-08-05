@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Political Giving Planner — 2026 (BC)</title>
+<style>
+  :root{
+    --ink:#1c2733;
+    --ink-soft:#4a5a6a;
+    --paper:#f6f4ef;
+    --card:#ffffff;
+    --line:#dfdbd2;
+    --line-strong:#c7c2b6;
+    --slate:#2f5d62;
+    --slate-deep:#1f4145;
+    --gold:#a67c2e;
+    --warn:#b23a3a;
+    --radius:10px;
+    --shadow:0 1px 2px rgba(28,39,51,.06), 0 8px 24px rgba(28,39,51,.05);
+    --mono:"SFMono-Regular",ui-monospace,"Cascadia Mono",Menlo,Consolas,monospace;
+    --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:"Newsreader","Iowan Old Style",Georgia,"Times New Roman",serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+
+  header{background:linear-gradient(180deg,var(--slate-deep),var(--slate));color:#eef4f3;padding:44px 0 40px}
+  header .wrap{display:flex;flex-direction:column;gap:14px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#a9cbc7;display:flex;align-items:center;gap:10px}
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--gold)}
+  h1{font-family:var(--serif);font-weight:500;font-size:clamp(30px,5vw,46px);line-height:1.04;margin:0;max-width:20ch;letter-spacing:-.01em}
+  header p.lede{margin:0;max-width:56ch;color:#cfe0dd;font-size:16px}
+  .beta-tag{align-self:flex-start;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:4px 10px;color:#dcebe8}
+
+  .summary{position:sticky;top:0;z-index:20;background:rgba(246,244,239,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .summary .wrap{display:grid;grid-template-columns:repeat(3,1fr) 1.2fr;gap:0;align-items:stretch}
+  .metric{padding:16px 18px;border-right:1px solid var(--line)}
+  .metric:first-child{padding-left:0}
+  .metric .k{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+  .metric .v{font-family:var(--serif);font-size:26px;font-variant-numeric:tabular-nums;line-height:1.1;margin-top:2px}
+  .metric .v.money{color:var(--slate-deep)}
+  .metric .v.credit{color:var(--gold)}
+  .metric .sub{font-size:12px;color:var(--ink-soft);margin-top:1px}
+  .netcost{background:var(--ink);color:#fff;border-right:none;display:flex;flex-direction:column;justify-content:center}
+  .netcost .k{color:#9fb0bf}
+  .netcost .v{color:#fff}
+
+  main{padding:34px 0 60px}
+  .intro-note{font-size:14px;color:var(--ink-soft);max-width:66ch;margin:0 auto 30px;text-align:center}
+
+  .level{margin-bottom:34px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .level-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px 22px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .level-head .titleblock{display:flex;flex-direction:column;gap:4px;min-width:220px;flex:1}
+  .level-tag{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--slate)}
+  .level-head h2{font-family:var(--serif);font-weight:500;font-size:22px;margin:0}
+  .level-head .desc{font-size:13px;color:var(--ink-soft);max-width:52ch}
+  .level-credit-box{text-align:right;font-size:12px;color:var(--ink-soft);min-width:180px}
+  .level-credit-box .amt{font-family:var(--serif);font-size:20px;color:var(--gold);font-variant-numeric:tabular-nums}
+  .level-credit-box.none .amt{color:var(--ink-soft);font-size:15px;font-style:italic}
+
+  .rows{padding:6px 22px 8px}
+  .rowhead{display:grid;grid-template-columns:1fr 150px 150px 34px;gap:16px;padding:10px 0 8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);border-bottom:1px solid var(--line)}
+  .rowhead .r{text-align:right}
+  .rec{display:grid;grid-template-columns:1fr 150px 150px 34px;gap:16px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}
+  .rec:last-child{border-bottom:none}
+  .rec .name{font-weight:500;font-size:15px}
+  .rec .name .edit{font:inherit;font-weight:500;border:none;background:transparent;color:var(--ink);width:100%;padding:2px 4px;margin:-2px -4px;border-radius:5px}
+  .rec .name .edit:hover{background:#f2efe8}
+  .rec .name .edit:focus{outline:none;background:#fff;box-shadow:0 0 0 2px rgba(47,93,98,.25)}
+  .rec .limit-note{font-size:12px;color:var(--ink-soft);margin-top:2px}
+  .rec .limit-note.tracked{color:var(--slate)}
+  .inputcell{position:relative}
+  .inputcell .dollar{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink-soft);font-size:15px;pointer-events:none}
+  input[type="number"]{width:100%;padding:11px 12px 11px 24px;border:1px solid var(--line-strong);border-radius:8px;font-size:15px;font-family:var(--sans);font-variant-numeric:tabular-nums;text-align:right;background:#fdfcfa;color:var(--ink);transition:border-color .12s,box-shadow .12s;-moz-appearance:textfield}
+  input[type="number"]::-webkit-outer-spin-button,input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  input[type="number"]:focus{outline:none;border-color:var(--slate);box-shadow:0 0 0 3px rgba(47,93,98,.14)}
+  input.over{border-color:var(--warn);background:#fdf3f2}
+  input.over:focus{box-shadow:0 0 0 3px rgba(178,58,58,.16)}
+  .creditcell{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--serif);font-size:16px;color:var(--gold)}
+  .creditcell.zero{color:var(--ink-soft);font-family:var(--sans);font-size:14px}
+  .removecell{display:flex;justify-content:flex-end}
+  .removebtn{width:26px;height:26px;border-radius:6px;border:1px solid var(--line);background:#fff;color:var(--ink-soft);cursor:pointer;font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center;transition:.12s}
+  .removebtn:hover{border-color:var(--warn);color:var(--warn);background:#fdf3f2}
+  .removebtn:disabled{opacity:0;pointer-events:none}
+
+  .addbtn{margin:12px 0 4px;background:none;border:1px dashed var(--line-strong);color:var(--slate);font-family:var(--sans);font-size:13px;font-weight:500;padding:9px 14px;border-radius:8px;cursor:pointer;transition:.12s;display:inline-flex;align-items:center;gap:7px}
+  .addbtn:hover{border-color:var(--slate);background:rgba(47,93,98,.05)}
+  .addbtn .plus{font-size:15px;line-height:1}
+  .addbar{display:flex;flex-wrap:wrap;gap:10px;padding:0 22px 4px}
+
+  .hint{font-size:12.5px;color:var(--ink-soft);padding:8px 22px 16px;max-width:64ch}
+
+  .explainer{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px 22px;margin-bottom:34px}
+  .explainer h3{font-family:var(--serif);font-weight:500;font-size:19px;margin:0 0 6px}
+  .explainer p{font-size:13.5px;color:var(--ink-soft);margin:0 0 16px;max-width:70ch}
+  .brackets{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:640px){.brackets{grid-template-columns:1fr}}
+  .bracket{border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+  .bracket h4{margin:0 0 10px;font-size:13px;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--slate)}
+  .tier{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px dashed var(--line);font-variant-numeric:tabular-nums}
+  .tier:last-child{border-bottom:none}
+  .tier .rate{font-family:var(--serif);color:var(--gold)}
+  .bracket .cap{margin-top:9px;font-size:12px;color:var(--ink-soft)}
+
+  .disclaimer{border-top:1px solid var(--line);padding-top:24px;font-size:12.5px;color:var(--ink-soft);max-width:74ch}
+  .disclaimer strong{color:var(--ink)}
+  .disclaimer a{color:var(--slate);text-decoration:none;border-bottom:1px solid var(--line-strong)}
+  .disclaimer a:hover{border-color:var(--slate)}
+  .sources{margin-top:12px;font-family:var(--mono);font-size:11px;letter-spacing:.02em}
+
+  footer{padding:22px 0 40px;color:var(--ink-soft);font-size:12px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .footer-actions{display:flex;gap:10px}
+  .btn-lite{background:none;border:1px solid var(--line-strong);color:var(--ink-soft);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:7px 12px;border-radius:8px;cursor:pointer;transition:.12s}
+  .btn-lite:hover{border-color:var(--slate);color:var(--slate)}
+
+  @media(max-width:760px){
+    .summary .wrap{grid-template-columns:1fr 1fr}
+    .metric{border-bottom:1px solid var(--line)}
+    .metric:nth-child(2){border-right:none}
+    .netcost{grid-column:1 / -1}
+    .rowhead,.rec{grid-template-columns:1fr 110px 92px 30px;gap:10px}
+    .rec .name{font-size:14px}
+  }
+  @media(max-width:460px){
+    .rowhead,.rec{grid-template-columns:1fr 92px 30px;gap:8px}
+    .rowhead .c-credit,.rec .creditcell{display:none}
+  }
+  @media print{
+    .summary{position:static}
+    .addbar,.removecell,.footer-actions,.beta-tag{display:none!important}
+    header{background:none;color:#000;padding:10px 0;border-bottom:2px solid #000}
+    .eyebrow,header p.lede{color:#333}
+    body{background:#fff}
+    .level,.explainer{box-shadow:none;break-inside:avoid}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <span class="beta-tag">Beta · 2026 figures</span>
+    <span class="eyebrow"><span class="dot"></span>British Columbia · Federal · Provincial · Municipal</span>
+    <h1>Plan your political giving across all three levels of Canadian elections.</h1>
+    <p class="lede">Enter what you intend to give. This planner tracks each contribution against its 2026 legal limit and calculates your federal and B.C. tax credits as you go — so you can see your real out-of-pocket cost before you donate.</p>
+  </div>
+</header>
+
+<div class="summary">
+  <div class="wrap">
+    <div class="metric">
+      <div class="k">Total planned</div>
+      <div class="v money" id="sumTotal">$0</div>
+      <div class="sub">across all recipients</div>
+    </div>
+    <div class="metric">
+      <div class="k">Federal credit</div>
+      <div class="v credit" id="sumFedCredit">$0</div>
+      <div class="sub">max $650 / year</div>
+    </div>
+    <div class="metric">
+      <div class="k">B.C. credit</div>
+      <div class="v credit" id="sumBcCredit">$0</div>
+      <div class="sub">max $500 / year</div>
+    </div>
+    <div class="metric netcost">
+      <div class="k">Estimated net cost to you</div>
+      <div class="v" id="sumNet">$0</div>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="wrap">
+    <p class="intro-note">Credits are calculated on your <em>annual total</em> to each level using the accurate progressive brackets — the same way the CRA and B.C. do it on your return. Use <strong>Add</strong> to plan more than one party, independent, or candidate; click a recipient's name to rename it. Amounts over a legal limit are flagged; municipal donations earn no tax credit.</p>
+
+    <!-- FEDERAL -->
+    <section class="level" data-level="federal">
+      <div class="level-head">
+        <div class="titleblock">
+          <span class="level-tag">Level 01 · Federal</span>
+          <h2>Federal elections</h2>
+          <span class="desc">Per registered party, per year. The combined limit covers that party's riding associations, nomination contestants, and candidates together.</span>
+        </div>
+        <div class="level-credit-box">
+          <div>Federal tax credit</div>
+          <div class="amt" id="fedCreditBox">$0</div>
+          <div>on <span id="fedTotalBox">$0</span> in eligible gifts</div>
+        </div>
+      </div>
+      <div class="rows" id="fedRows">
+        <div class="rowhead"><div>Recipient</div><div class="r">You give</div><div class="r c-credit">Credit share</div><div></div></div>
+      </div>
+      <div class="addbar" id="fedAdd"></div>
+      <p class="hint">The $1,775 party limit and the $1,775 combined associations/candidates limit are <em>separate</em> — you can give the maximum to both for the same party. Independent candidates each carry their own $1,775 limit.</p>
+    </section>
+
+    <!-- PROVINCIAL -->
+    <section class="level" data-level="bc">
+      <div class="level-head">
+        <div class="titleblock">
+          <span class="level-tag">Level 02 · Provincial</span>
+          <h2>B.C. provincial elections</h2>
+          <span class="desc">One combined limit of $1,513.29 per registered party — covering the party, its candidates, nomination contestants and constituency associations together.</span>
+        </div>
+        <div class="level-credit-box">
+          <div>B.C. tax credit</div>
+          <div class="amt" id="bcCreditBox">$0</div>
+          <div>on <span id="bcTotalBox">$0</span> in eligible gifts</div>
+        </div>
+      </div>
+      <div class="rows" id="bcRows">
+        <div class="rowhead"><div>Recipient</div><div class="r">You give</div><div class="r c-credit">Credit share</div><div></div></div>
+      </div>
+      <div class="addbar" id="bcAdd"></div>
+      <p class="hint">The $1,513.29 limit excludes convention fees of up to $430 and a candidate's own personal election expenses.</p>
+    </section>
+
+    <!-- MUNICIPAL -->
+    <section class="level" data-level="muni">
+      <div class="level-head">
+        <div class="titleblock">
+          <span class="level-tag">Level 03 · Municipal (local)</span>
+          <h2>B.C. local elections</h2>
+          <span class="desc">Province-wide rule under the Local Elections Campaign Financing Act: $1,429.70 per candidate or elector organization, per campaign. An endorsed candidate shares the organization's single limit.</span>
+        </div>
+        <div class="level-credit-box none">
+          <div>Tax credit</div>
+          <div class="amt">None available</div>
+          <div>local donations aren't receiptable</div>
+        </div>
+      </div>
+      <div class="rows" id="muniRows">
+        <div class="rowhead"><div>Recipient</div><div class="r">You give</div><div class="r c-credit">Credit</div><div></div></div>
+      </div>
+      <div class="addbar" id="muniAdd"></div>
+      <p class="hint">Contributions to local candidates and elector organizations are <em>not</em> eligible for tax receipts — so there is no credit here by design.</p>
+    </section>
+
+    <!-- EXPLAINER -->
+    <section class="explainer">
+      <h3>How the tax credits are calculated</h3>
+      <p>Both credits are progressive: the first dollars are credited most generously, later dollars less so. The planner applies these brackets to your <em>combined annual total</em> at each level, then caps the result. Because the top of each scale is reached well below the annual contribution limit, giving more than the amounts below returns no extra credit.</p>
+      <div class="brackets">
+        <div class="bracket">
+          <h4>Federal credit</h4>
+          <div class="tier"><span>First $400</span><span class="rate">75%</span></div>
+          <div class="tier"><span>$400 – $750</span><span class="rate">50%</span></div>
+          <div class="tier"><span>Above $750</span><span class="rate">33⅓%</span></div>
+          <div class="cap">Maximum credit <strong>$650/year</strong> — reached at $1,275 in total federal gifts.</div>
+        </div>
+        <div class="bracket">
+          <h4>B.C. provincial credit</h4>
+          <div class="tier"><span>First $100</span><span class="rate">75%</span></div>
+          <div class="tier"><span>$100 – $550</span><span class="rate">50%</span></div>
+          <div class="tier"><span>Above $550</span><span class="rate">33⅓%</span></div>
+          <div class="cap">Maximum credit <strong>$500/year</strong> — reached at $1,150 in total provincial gifts. Non-refundable; no carry-forward.</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="disclaimer">
+      <strong>For planning purposes only.</strong> These figures reflect 2026 contribution limits and tax-credit brackets as published by Elections Canada, Elections BC, and the CRA / B.C. Ministry of Finance. Limits are indexed and change at the start of each calendar year, and tax credits depend on your personal tax situation — credits are non-refundable and only reduce tax you actually owe. This tool does not constitute legal, financial, or tax advice. Before giving, confirm current limits with <a href="https://www.elections.ca" target="_blank" rel="noopener">Elections Canada</a> and <a href="https://elections.bc.ca" target="_blank" rel="noopener">Elections BC</a>, and consult a qualified tax professional about your own return.
+      <div class="sources">Sources: Elections Canada — Annual Limits 2026 · Elections BC — 2026 contribution limits · CRA &amp; B.C. political contribution tax credit brackets.</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Political Giving Planner · Beta · Data current for 2026 (British Columbia)</span>
+    <div class="footer-actions">
+      <button class="btn-lite" id="printBtn" type="button">Print / Save PDF</button>
+      <button class="btn-lite" id="resetBtn" type="button">Reset all fields</button>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  const CFG = {
+    federal:{ partyLimit:1775, combinedLimit:1775, independentLimit:1775,
+      credit:{ tiers:[[400,.75],[350,.50]], topRate:1/3, max:650 } },
+    bc:{ combinedLimit:1513.29,
+      credit:{ tiers:[[100,.75],[450,.50]], topRate:1/3, max:500 } },
+    muni:{ limit:1429.70 }
+  };
+
+  const fmt = n => "$" + (Math.round(n*100)/100).toLocaleString("en-CA",{minimumFractionDigits:(n%1?2:0),maximumFractionDigits:2});
+  const fmt0 = n => "$" + Math.round(n).toLocaleString("en-CA");
+
+  function credit(total,c){
+    let cr=0,rem=total;
+    for(const [amt,rate] of c.tiers){ const t=Math.min(rem,amt); if(t<=0) break; cr+=t*rate; rem-=t; }
+    if(rem>0) cr+=rem*c.topRate;
+    return Math.min(cr,c.max);
+  }
+
+  let uid = 0;
+
+  // Templates for repeatable recipients, keyed by button
+  const TEMPLATES = {
+    fedParty:   ()=>({name:`Federal party ${++TEMPLATES._p}`, note:`Party limit ${fmt(CFG.federal.partyLimit)} / yr`, limit:CFG.federal.partyLimit, removable:true}),
+    fedComb:    ()=>({name:`Party ${TEMPLATES._p||1} — associations & candidates`, note:`Combined limit ${fmt(CFG.federal.combinedLimit)} / yr`, limit:CFG.federal.combinedLimit, tracked:true, removable:true}),
+    fedIndep:   ()=>({name:`Independent candidate ${++TEMPLATES._fi}`, note:`Limit ${fmt(CFG.federal.independentLimit)} each / yr`, limit:CFG.federal.independentLimit, removable:true}),
+    bcParty:    ()=>({name:`B.C. party ${++TEMPLATES._bp}`, note:`Combined limit ${fmt(CFG.bc.combinedLimit)} / yr`, limit:CFG.bc.combinedLimit, tracked:true, removable:true}),
+    bcIndep:    ()=>({name:`Independent candidate ${++TEMPLATES._bi}`, note:`Limit ${fmt(CFG.bc.combinedLimit)} each / yr`, limit:CFG.bc.combinedLimit, removable:true}),
+    bcLeader:   ()=>({name:`Leadership contestant ${++TEMPLATES._bl}`, note:`Limit ${fmt(CFG.bc.combinedLimit)} per contest`, limit:CFG.bc.combinedLimit, removable:true}),
+    muniCand:   ()=>({name:`Local candidate ${++TEMPLATES._mc}`, note:`Limit ${fmt(CFG.muni.limit)} per campaign`, limit:CFG.muni.limit, removable:true}),
+    muniOrg:    ()=>({name:`Elector organization ${++TEMPLATES._mo}`, note:`Limit ${fmt(CFG.muni.limit)} per campaign`, limit:CFG.muni.limit, removable:true})
+  };
+  TEMPLATES._p=0;TEMPLATES._fi=0;TEMPLATES._bp=0;TEMPLATES._bi=0;TEMPLATES._bl=0;TEMPLATES._mc=0;TEMPLATES._mo=0;
+
+  function rowHTML(r){
+    const id = "r"+(++uid);
+    return `<div class="rec" data-id="${id}">
+      <div class="name"><input class="edit" type="text" value="${r.name.replace(/"/g,'&quot;')}" aria-label="Recipient name" spellcheck="false"></div>
+      <div class="inputcell"><span class="dollar">$</span><input type="number" min="0" step="5" inputmode="decimal" data-limit="${r.limit}" placeholder="0" aria-label="${r.name} amount"></div>
+      <div class="creditcell zero c-credit" data-credit>—</div>
+      <div class="removecell"><button class="removebtn" type="button" title="Remove" aria-label="Remove ${r.name}" ${r.removable?'':'disabled'}>×</button></div>
+    </div>`;
+  }
+
+  function addRow(container, r){
+    container.insertAdjacentHTML('beforeend', rowHTML(r));
+    const rec = container.lastElementChild;
+    rec.querySelector('input[type=number]').addEventListener('input', recompute);
+    rec.querySelector('.edit').addEventListener('input', ()=>{}); // name is free-text, no recompute needed
+    const rm = rec.querySelector('.removebtn');
+    rm.addEventListener('click', ()=>{ rec.remove(); recompute(); });
+    return rec;
+  }
+
+  // Base (non-removable) recipients present on load
+  const BASE = {
+    fedRows:[
+      {name:'Federal party 1', note:`Party limit ${fmt(CFG.federal.partyLimit)} / yr`, limit:CFG.federal.partyLimit},
+      {name:'Party 1 — associations & candidates', note:`Combined limit ${fmt(CFG.federal.combinedLimit)} / yr`, limit:CFG.federal.combinedLimit, tracked:true}
+    ],
+    bcRows:[
+      {name:'Registered party (incl. candidates & associations)', note:`Combined limit ${fmt(CFG.bc.combinedLimit)} / yr`, limit:CFG.bc.combinedLimit, tracked:true}
+    ],
+    muniRows:[
+      {name:'Local candidate (mayor / councillor / trustee)', note:`Limit ${fmt(CFG.muni.limit)} per campaign`, limit:CFG.muni.limit},
+      {name:'Elector organization (local party)', note:`Limit ${fmt(CFG.muni.limit)} per campaign`, limit:CFG.muni.limit}
+    ]
+  };
+  TEMPLATES._p = 1; // base already used "Federal party 1"
+
+  // Add-buttons per level: [label, template key, target container id]
+  const ADDERS = {
+    fedAdd:[['Add a party','fedParty','fedRows'],['Add associations/candidates line','fedComb','fedRows'],['Add an independent','fedIndep','fedRows']],
+    bcAdd:[['Add a party','bcParty','bcRows'],['Add an independent','bcIndep','bcRows'],['Add a leadership contestant','bcLeader','bcRows']],
+    muniAdd:[['Add a local candidate','muniCand','muniRows'],['Add an elector organization','muniOrg','muniRows']]
+  };
+
+  function buildAdders(){
+    Object.entries(ADDERS).forEach(([barId, defs])=>{
+      const bar = document.getElementById(barId);
+      defs.forEach(([label,key,target])=>{
+        const b = document.createElement('button');
+        b.className='addbtn'; b.type='button';
+        b.innerHTML = `<span class="plus">+</span>${label}`;
+        b.addEventListener('click', ()=>{ addRow(document.getElementById(target), TEMPLATES[key]()); recompute(); });
+        bar.appendChild(b);
+      });
+    });
+  }
+
+  const fedRows=document.getElementById('fedRows');
+  const bcRows=document.getElementById('bcRows');
+  const muniRows=document.getElementById('muniRows');
+
+  function seed(){
+    BASE.fedRows.forEach(r=>addRow(fedRows,r));
+    BASE.bcRows.forEach(r=>addRow(bcRows,r));
+    BASE.muniRows.forEach(r=>addRow(muniRows,r));
+  }
+
+  function levelTotal(container){
+    let total=0;
+    container.querySelectorAll('.rec').forEach(rec=>{
+      const inp=rec.querySelector('input[type=number]');
+      const v=parseFloat(inp.value)||0;
+      const lim=parseFloat(inp.dataset.limit)||Infinity;
+      inp.classList.toggle('over', v>lim+0.005);
+      total+=v;
+    });
+    return total;
+  }
+
+  function distributeCredit(container,totalCredit,total){
+    container.querySelectorAll('.rec').forEach(rec=>{
+      const v=parseFloat(rec.querySelector('input[type=number]').value)||0;
+      const cell=rec.querySelector('[data-credit]');
+      if(v<=0||total<=0){cell.textContent='—';cell.classList.add('zero');return;}
+      const share=totalCredit*(v/total);
+      cell.textContent=fmt(share);
+      cell.classList.toggle('zero',share<0.005);
+    });
+  }
+
+  function recompute(){
+    const fedTotal=levelTotal(fedRows);
+    const bcTotal=levelTotal(bcRows);
+    const muniTotal=levelTotal(muniRows);
+    const fedCredit=credit(fedTotal,CFG.federal.credit);
+    const bcCredit=credit(bcTotal,CFG.bc.credit);
+    distributeCredit(fedRows,fedCredit,fedTotal);
+    distributeCredit(bcRows,bcCredit,bcTotal);
+    muniRows.querySelectorAll('[data-credit]').forEach(c=>{c.textContent='—';c.classList.add('zero');});
+    const grand=fedTotal+bcTotal+muniTotal;
+    const net=grand-fedCredit-bcCredit;
+    document.getElementById('sumTotal').textContent=fmt0(grand);
+    document.getElementById('sumFedCredit').textContent=fmt0(fedCredit);
+    document.getElementById('sumBcCredit').textContent=fmt0(bcCredit);
+    document.getElementById('sumNet').textContent=fmt0(net);
+    document.getElementById('fedCreditBox').textContent=fmt0(fedCredit);
+    document.getElementById('fedTotalBox').textContent=fmt0(fedTotal);
+    document.getElementById('bcCreditBox').textContent=fmt0(bcCredit);
+    document.getElementById('bcTotalBox').textContent=fmt0(bcTotal);
+  }
+
+  document.getElementById('printBtn').addEventListener('click',()=>window.print());
+  document.getElementById('resetBtn').addEventListener('click',()=>{
+    fedRows.querySelectorAll('.rec').forEach(r=>r.remove());
+    bcRows.querySelectorAll('.rec').forEach(r=>r.remove());
+    muniRows.querySelectorAll('.rec').forEach(r=>r.remove());
+    TEMPLATES._p=1;TEMPLATES._fi=0;TEMPLATES._bp=0;TEMPLATES._bi=0;TEMPLATES._bl=0;TEMPLATES._mc=0;TEMPLATES._mo=0;
+    seed(); recompute();
+  });
+
+  buildAdders();
+  seed();
+  recompute();
+})();
+</script>
+</body>
+</html>
